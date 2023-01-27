@@ -1,7 +1,19 @@
+import os
 import sys
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QWidget, QDesktopWidget, QHBoxLayout, QVBoxLayout
 from PyQt5.QtWidgets import QPushButton, QLineEdit, QTableWidget, QTableWidgetItem, QLabel
 
+BASE_DIR = os.path.dirname(os.path.realpath(sys.argv[0]))
+
+STATUS_MAPPING = {
+    0: "初始化中",
+    1: "待执行",
+    2: "正在执行",
+    3: "完成并提醒",
+    10: "异常并停止",
+    11: "初始化失败",
+}
 
 class MainWindows(QWidget):
     def __init__(self):
@@ -80,6 +92,31 @@ class MainWindows(QWidget):
             item.setText(info['text'])
             table_widget.setHorizontalHeaderItem(idx,item)
             table_widget.setColumnWidth(idx, info['width'])
+
+        # 3.2 初始化表格数据
+        # 读取数据文件
+        import json
+        file_path = os.path.join(BASE_DIR, "db", "db.json")
+        with open(file_path, mode='r', encoding='utf-8') as f:
+            data = f.read()
+        data_list = json.loads(data)
+
+
+        current_row_count = table_widget.rowCount() # 当前表格有多少行
+        for row_list in data_list:
+            table_widget.insertRow(current_row_count)
+
+            # row_list    # ['B08166SLDF', 'AMD er', 'https://www.amazon.com/gp/offer-listing/B08166SLDF/ref=dp_olp_all_mbc?ie=UTF8&condition=new', 300.0, 0, 166, 1, 5]
+            # 写真是数据
+            for i, ele in enumerate(row_list):
+                ele = STATUS_MAPPING[ele] if i == 6 else ele
+                cell = QTableWidgetItem(str(ele))
+                if i in [0, 4, 5, 6]:
+                    # 不可修改
+                    cell.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+                table_widget.setItem(current_row_count, i, cell)
+
+            current_row_count += 1
 
         table_layout.addWidget(table_widget)
 
