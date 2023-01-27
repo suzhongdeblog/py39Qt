@@ -21,6 +21,15 @@ class MainWindows(QWidget):
         # 创建布局
         layout = QVBoxLayout()
 
+        layout.addLayout(self.init_header())
+        layout.addLayout(self.init_form())
+        layout.addLayout(self.init_table())
+        layout.addLayout(self.init_footer())
+
+        # 给窗体设置元素的排列方式
+        self.setLayout(layout)
+
+    def init_header(self):
         # 1.创建顶部菜单布局
         header_layout = QHBoxLayout()
         # 1.1 创建按钮,加入 header_layout
@@ -33,8 +42,9 @@ class MainWindows(QWidget):
         # 弹簧
         header_layout.addStretch()
 
-        layout.addLayout(header_layout)
+        return header_layout
 
+    def init_form(self):
         # 2.创建上面标题布局
         form_layout = QHBoxLayout()
 
@@ -47,8 +57,9 @@ class MainWindows(QWidget):
         btn_add = QPushButton("添加")
         form_layout.addWidget(btn_add)
 
-        layout.addLayout(form_layout)
+        return form_layout
 
+    def init_table(self):
         # 3.创建中间的表格
         table_layout = QHBoxLayout()
 
@@ -72,8 +83,9 @@ class MainWindows(QWidget):
 
         table_layout.addWidget(table_widget)
 
-        layout.addLayout(table_layout)
+        return table_layout
 
+    def init_footer(self):
         # 2.底部菜单
         footer_layout = QHBoxLayout()
 
@@ -100,10 +112,7 @@ class MainWindows(QWidget):
         btn_proxy = QPushButton("代理IP")
         footer_layout.addWidget(btn_proxy)
 
-        layout.addLayout(footer_layout)
-
-        # 给窗体设置元素的排列方式
-        self.setLayout(layout)
+        return footer_layout
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
