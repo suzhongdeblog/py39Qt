@@ -3,8 +3,10 @@ import sys
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QWidget, QDesktopWidget, QHBoxLayout, QVBoxLayout
 from PyQt5.QtWidgets import QPushButton, QLineEdit, QTableWidget, QTableWidgetItem, QLabel
+from PyQt5.QtWidgets import QMessageBox
 
 BASE_DIR = os.path.dirname(os.path.realpath(sys.argv[0]))
+
 
 STATUS_MAPPING = {
     0: "初始化中",
@@ -18,6 +20,8 @@ STATUS_MAPPING = {
 class MainWindows(QWidget):
     def __init__(self):
         super().__init__()
+        # 控件
+        self.txt_asin=None
 
         # 窗体标题和尺寸
         self.setWindowTitle('NB的xx系统')
@@ -62,11 +66,14 @@ class MainWindows(QWidget):
 
         # 2.1 输入框
         txt_asin = QLineEdit()
+        txt_asin.setText("B08166SLDF=100")
         txt_asin.setPlaceholderText("请输入商品ID和价格,例如: B0818JJQQ8=88")
+        self.txt_asin = txt_asin
         form_layout.addWidget(txt_asin)
 
         # 2.2 添加按钮
         btn_add = QPushButton("添加")
+        btn_add.clicked.connect(self.event_add_click)
         form_layout.addWidget(btn_add)
 
         return form_layout
@@ -76,7 +83,7 @@ class MainWindows(QWidget):
         table_layout = QHBoxLayout()
 
         # 3.1 创建表格
-        table_widget = QTableWidget(0,8)
+        self.table_widget = table_widget = QTableWidget(0,8)
         table_header = [
             {"field": "asin", "text": "ASIN", 'width': 120},
             {"field": "title", "text": "标题", 'width': 150},
@@ -150,6 +157,71 @@ class MainWindows(QWidget):
         footer_layout.addWidget(btn_proxy)
 
         return footer_layout
+
+    # 点击添加按钮
+    def event_add_click(self):
+        # 1.获取输入框中的内容
+        text = self.txt_asin.text()
+        text = text.strip()
+        if not text:
+            QMessageBox.warning(self, "错误", "商品的ASIN输入错误")
+            return
+        # B08166SLDF=100
+        asin, price = text.split("=")
+        price = float(price)
+
+        # 2.加入到表格中 (型号,底价)
+        new_row_list = [asin, "", "", price, 0, 0, 0, 5]
+
+        current_row_count = self.table_widget.rowCount()  # 当前表格有多少行
+        self.table_widget.insertRow(current_row_count)
+        for i, ele in enumerate(new_row_list):
+            ele = STATUS_MAPPING[ele] if i == 6 else ele
+            cell = QTableWidgetItem(str(ele))
+            if i in [0, 4, 5, 6]:
+                # 不可修改
+                cell.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.table_widget.setItem(current_row_count, i, cell)
+
+        # 3.发送请求自动获取标题 (爬虫获取数据)
+        # 注意: 不能在主线程中做爬虫的事,创建一个线程去做爬虫,爬取到数据再更新到窗体应用 (信号)。
+        from utils.threads import NewTaskThread
+        thread = NewTaskThread(current_row_count,asin,self)
+        thread.success.connect(self.init_task_success_callback)
+        thread.success.connect(self.init_task_error_callback)
+        thread.start()
+        pass
+    def init_task_success_callback(self, row_index, asin, title, url):
+        # 更新标题
+        cell_title = QTableWidgetItem(title)
+        self.table_widget.setItem(row_index, 1, cell_title)
+
+        # 更新URL
+        cell_url = QTableWidgetItem(url)
+        self.table_widget.setItem(row_index, 2, cell_url)
+
+        # 更新状态
+        cell_status = QTableWidgetItem(STATUS_MAPPING[1])
+        cell_status.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+        self.table_widget.setItem(row_index, 6, cell_status)
+
+        # 输入框清空
+        self.txt_asin.clear()
+
+    def init_task_error_callback(self, row_index, asin, title, url):
+        # 更新标题
+        cell_title = QTableWidgetItem(title)
+        self.table_widget.setItem(row_index, 1, cell_title)
+
+        # 更新URL
+        cell_url = QTableWidgetItem(url)
+        self.table_widget.setItem(row_index, 2, cell_url)
+
+        # 更新状态
+        cell_status = QTableWidgetItem(STATUS_MAPPING[11])
+        cell_status.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+        self.table_widget.setItem(row_index, 6, cell_status)
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
