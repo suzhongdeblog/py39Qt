@@ -138,8 +138,9 @@ class MainWindows(QWidget):
 
         footer_layout.addStretch()
 
-        btn_reinit = QPushButton("重新初始化")
-        footer_layout.addWidget(btn_reinit)
+        btn_reset = QPushButton("重新初始化")
+        btn_reset.clicked.connect(self.event_reset_click)
+        footer_layout.addWidget(btn_reset)
 
         btn_recheck = QPushButton("重新检测")
         footer_layout.addWidget(btn_recheck)
@@ -188,7 +189,7 @@ class MainWindows(QWidget):
         from utils.threads import NewTaskThread
         thread = NewTaskThread(current_row_count,asin,self)
         thread.success.connect(self.init_task_success_callback)
-        thread.success.connect(self.init_task_error_callback)
+        thread.error.connect(self.init_task_error_callback)
         thread.start()
         pass
     def init_task_success_callback(self, row_index, asin, title, url):
@@ -221,6 +222,32 @@ class MainWindows(QWidget):
         cell_status = QTableWidgetItem(STATUS_MAPPING[11])
         cell_status.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
         self.table_widget.setItem(row_index, 6, cell_status)
+
+    # 点击重新初始化
+    def event_reset_click(self):
+        # 1.获取已经选中的行
+        row_list = self.table_widget.selectionModel().selectedRows()
+        if not row_list:
+            QMessageBox.warning(self, "错误", "请选择要重新初始化的行")
+            return
+        # 2.获取每一行进行重新初始化
+        for row_object in row_list:
+            index = row_object.row()
+            print("选中的行：",index)
+            # 获取型号
+            asin = self.table_widget.item(index,0).text().strip()
+
+            # 状态重新初始化
+            cell_status = QTableWidgetItem(STATUS_MAPPING[0])
+            cell_status.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.table_widget.setItem(index, 6, cell_status)
+
+            # 创建线程去进行初始化动作
+            from utils.threads import NewTaskThread
+            thread = NewTaskThread(index, asin, self)
+            thread.success.connect(self.init_task_success_callback)
+            thread.error.connect(self.init_task_error_callback)
+            thread.start()
 
 
 if __name__ == '__main__':
