@@ -158,8 +158,8 @@ class MainWindows(QWidget):
         footer_layout.addWidget(btn_alert)
 
         btn_proxy = QPushButton("代理IP")
+        btn_proxy.clicked.connect(self.event_proxy_click)
         footer_layout.addWidget(btn_proxy)
-
         return footer_layout
 
     # 点击添加按钮
@@ -297,6 +297,14 @@ class MainWindows(QWidget):
         from utils.dialog import AlertDialog
 
         dialog = AlertDialog()
+        dialog.setWindowModality(Qt.ApplicationModal)
+        dialog.exec_()
+
+    # 点击代理
+    def event_proxy_click(self):
+        from utils.dialog import ProxyDialog
+
+        dialog = ProxyDialog()
         dialog.setWindowModality(Qt.ApplicationModal)
         dialog.exec_()
 

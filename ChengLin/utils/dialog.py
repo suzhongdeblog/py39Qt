@@ -76,3 +76,50 @@ class AlertDialog(QDialog):
 
         # 关闭对话框
         self.close()
+
+
+
+
+class ProxyDialog(QDialog):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.init_ui()
+
+    def init_ui(self):
+        self.setWindowTitle("配置代理IP")
+        self.resize(500, 400)
+        layout = QVBoxLayout()
+
+        # 输入框
+        text_edit = QTextEdit()
+        text_edit.setPlaceholderText("可用换行来设置多个代理IP,每个代理IP设置格式为：31.40.225.250:3128")
+
+        # 读取本地文件
+        file_path = os.path.join("db", "proxy.txt")
+        all_proxy = ""
+        if os.path.exists(file_path):
+            with open(os.path.join("db", "proxy.txt"), mode='r', encoding='utf-8') as f:
+                all_proxy = f.read()
+        text_edit.setText(all_proxy)
+
+        self.text_edit = text_edit
+        layout.addWidget(text_edit)
+
+        footer_config = QHBoxLayout()
+
+        btn_save = QPushButton("重置")
+        btn_save.clicked.connect(self.event_save_click)
+        footer_config.addWidget(btn_save, 0, Qt.AlignRight)
+
+        layout.addLayout(footer_config)
+
+        self.setLayout(layout)
+
+    def event_save_click(self):
+        # PROXY.write()
+        text = self.text_edit.toPlainText()
+
+        # 写入到代理文件中
+        with open(os.path.join("db", "proxy.txt"), mode='w', encoding='utf-8') as f:
+            f.write(text)
+        self.close()
