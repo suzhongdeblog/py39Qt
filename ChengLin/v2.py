@@ -154,6 +154,7 @@ class MainWindows(QWidget):
         footer_layout.addWidget(btn_delete)
 
         btn_alert = QPushButton("SMTP报警配置")
+        btn_alert.clicked.connect(self.event_alert_click)
         footer_layout.addWidget(btn_alert)
 
         btn_proxy = QPushButton("代理IP")
@@ -274,6 +275,7 @@ class MainWindows(QWidget):
             cell_status.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.table_widget.setItem(index, 5, cell_status)
 
+    # 点击删除
     def event_delete_click(self):
         # 1.获取已经选中的行
         row_list = self.table_widget.selectionModel().selectedRows()
@@ -288,6 +290,15 @@ class MainWindows(QWidget):
             index = row_object.row()
             self.table_widget.removeRow(index)
 
+    # 点击邮件配置
+    def event_alert_click(self):
+        # 创建弹窗并在弹窗中进行设置
+
+        from utils.dialog import AlertDialog
+
+        dialog = AlertDialog()
+        dialog.setWindowModality(Qt.ApplicationModal)
+        dialog.exec_()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
