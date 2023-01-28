@@ -150,6 +150,7 @@ class MainWindows(QWidget):
         footer_layout.addWidget(btn_reset_count)
 
         btn_delete = QPushButton("删除检测项")
+        btn_delete.clicked.connect(self.event_delete_click)
         footer_layout.addWidget(btn_delete)
 
         btn_alert = QPushButton("SMTP报警配置")
@@ -272,6 +273,20 @@ class MainWindows(QWidget):
             cell_status = QTableWidgetItem(str(0))
             cell_status.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.table_widget.setItem(index, 5, cell_status)
+
+    def event_delete_click(self):
+        # 1.获取已经选中的行
+        row_list = self.table_widget.selectionModel().selectedRows()
+        if not row_list:
+            QMessageBox.warning(self, "错误", "请选择要重新初始化的行")
+            return
+        # 2.翻转
+        row_list.reverse()
+
+        # 3.删除
+        for row_object in row_list:
+            index = row_object.row()
+            self.table_widget.removeRow(index)
 
 
 if __name__ == '__main__':
