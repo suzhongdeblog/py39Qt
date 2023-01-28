@@ -3,7 +3,8 @@ import sys
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QWidget, QDesktopWidget, QHBoxLayout, QVBoxLayout
 from PyQt5.QtWidgets import QPushButton, QLineEdit, QTableWidget, QTableWidgetItem, QLabel
-from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import QMessageBox, QMenu
+from utils.dialog import LogDialog
 
 BASE_DIR = os.path.dirname(os.path.realpath(sys.argv[0]))
 
@@ -125,9 +126,52 @@ class MainWindows(QWidget):
 
             current_row_count += 1
 
-        table_layout.addWidget(table_widget)
+        # 开启右键设置
+        table_widget.setContextMenuPolicy(Qt.CustomContextMenu)
+        table_widget.customContextMenuRequested.connect(self.table_right_menu)
 
+        table_layout.addWidget(table_widget)
         return table_layout
+    def table_right_menu(self, pos):
+
+        # 只有选中一行时,才支持右键
+        selected_item_list = self.table_widget.selectedItems()
+        if len(selected_item_list) == 0:
+            return
+
+
+        menu = QMenu()
+        item_copy = menu.addAction("复制")
+        item_log = menu.addAction("查看日志")
+        item_log_clear = menu.addAction("清除日志")
+
+        # 选中了那个?
+        action = menu.exec_(self.table_widget.mapToGlobal(pos))
+
+        if action == item_copy:
+            # 复制当前型号 B08166SLDF
+            clipboard = QApplication.clipboard()
+            clipboard.setText(selected_item_list[0].text())
+
+        if action == item_log:
+            # 查看日志,在对话框中显示日志信息
+
+            # 获取选中的型号
+            row_index = selected_item_list[0].row()
+            asin = self.table_widget.item(row_index, 0).text().strip()
+
+            dialog = LogDialog(asin)
+            dialog.setWindowModality(Qt.ApplicationModal)
+            dialog.exec_()
+
+        if action == item_log_clear:
+            # 清空日志
+            row_index = selected_item_list[0].row()
+            asin = self.table_widget.item(row_index, 0).text().strip()
+            file_path = os.path.join("log", "{}.log").format(asin)
+            if os.path.exists(file_path):
+                os.remove(file_path)
+
 
     def init_footer(self):
         # 2.底部菜单

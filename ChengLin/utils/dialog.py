@@ -123,3 +123,33 @@ class ProxyDialog(QDialog):
         with open(os.path.join("db", "proxy.txt"), mode='w', encoding='utf-8') as f:
             f.write(text)
         self.close()
+
+
+
+class LogDialog(QDialog):
+    def __init__(self, asin, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.asin = asin
+        self.init_ui()
+
+    def init_ui(self):
+        self.setWindowTitle("日志记录")
+        self.resize(500, 400)
+        layout = QVBoxLayout()
+        text_edit = QTextEdit()
+        text_edit.setText("")
+        layout.addWidget(text_edit)
+        self.setLayout(layout)
+
+        #  读取日志展示出来
+        file_path = os.path.join("log", "{}.log").format(self.asin)
+        if not os.path.exists(file_path):
+            return
+
+        with open(file_path,mode='r',encoding='utf-8') as f:
+            content = f.read()
+        text_edit.setText(content)
+
+        # content = LOGGER.get_log(self.asin)
+        # text_edit.setText(content)
+
