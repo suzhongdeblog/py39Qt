@@ -51,9 +51,11 @@ class MainWindows(QWidget):
         header_layout = QHBoxLayout()
         # 1.1 创建按钮,加入 header_layout
         btn_start = QPushButton("开始")
+        btn_start.clicked.connect(self.event_start_click)
         header_layout.addWidget(btn_start)
 
         btn_stop = QPushButton("停止")
+        btn_stop.clicked.connect(self.event_stop_click)
         header_layout.addWidget(btn_stop)
 
         # 弹簧
@@ -177,7 +179,7 @@ class MainWindows(QWidget):
         # 2.底部菜单
         footer_layout = QHBoxLayout()
 
-        label_status = QLabel("未检测")
+        self.label_status = label_status = QLabel("未检测")
         footer_layout.addWidget(label_status)
 
         footer_layout.addStretch()
@@ -351,6 +353,28 @@ class MainWindows(QWidget):
         dialog = ProxyDialog()
         dialog.setWindowModality(Qt.ApplicationModal)
         dialog.exec_()
+
+    # 点击开始
+    def event_start_click(self):
+        # 1.为每一行创建一个线程去执行   （所有的线程记录）   [x,x,x,x,x]
+        from utils.scheduler import SCHEDULER
+
+        SCHEDULER.start()
+        # 2.执行中
+        self.update_status_message("执行中")
+
+    # 点击停止
+    def event_stop_click(self):
+        # 1.执行中的线程逐一终止
+        from utils.scheduler import SCHEDULER
+
+        SCHEDULER.stop()
+        # 2.更新状态
+        pass
+
+    def update_status_message(self, message):
+        self.label_status.setText(message)
+        self.label_status.repaint()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
