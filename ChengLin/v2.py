@@ -146,6 +146,7 @@ class MainWindows(QWidget):
         footer_layout.addWidget(btn_recheck)
 
         btn_reset_count = QPushButton("次数清零")
+        btn_reset_count.clicked.connect(self.event_reset_count_click)
         footer_layout.addWidget(btn_reset_count)
 
         btn_delete = QPushButton("删除检测项")
@@ -248,6 +249,29 @@ class MainWindows(QWidget):
             thread.success.connect(self.init_task_success_callback)
             thread.error.connect(self.init_task_error_callback)
             thread.start()
+
+    # 点击数量清零
+    def event_reset_count_click(self):
+        # 1.获取已经选中的行
+        row_list = self.table_widget.selectionModel().selectedRows()
+        if not row_list:
+            QMessageBox.warning(self, "错误", "请选择要操作的行")
+            return
+        # 2.获取每一行进行重新初始化
+        for row_object in row_list:
+            index = row_object.row()
+            # print("选中的行：",index)
+            # # 获取型号
+            # asin = self.table_widget.item(index,0).text().strip()
+
+            # 状态重新初始化
+            cell_status = QTableWidgetItem(str(0))
+            cell_status.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.table_widget.setItem(index, 4, cell_status)
+
+            cell_status = QTableWidgetItem(str(0))
+            cell_status.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.table_widget.setItem(index, 5, cell_status)
 
 
 if __name__ == '__main__':
