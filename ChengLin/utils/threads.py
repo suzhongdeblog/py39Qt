@@ -44,11 +44,13 @@ class NewTaskThread(QThread):
 
 class TaskThread(QThread):
     start_signal = pyqtSignal(int)
+    stop_signal = pyqtSignal(int)
     counter_signal = pyqtSignal(int)
     error_counter_signal = pyqtSignal(int)
 
-    def __init__(self, log_file_path, row_index, asin, *args, **kwargs):
+    def __init__(self, scheduler, log_file_path, row_index, asin, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.scheduler = scheduler
         self.log_file_path = log_file_path
         self.row_index = row_index
         self.asin = asin
@@ -60,6 +62,11 @@ class TaskThread(QThread):
         import time
         import random
         while True:
+            # 停止
+            if self.scheduler.terminate:
+                self.stop_signal.emit(self.row_index)
+                return
+
             try:
                 time.sleep(random.randint(1, 3))
                 self.counter_signal.emit(self.row_index)
