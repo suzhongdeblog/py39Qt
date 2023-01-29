@@ -409,7 +409,7 @@ class MainWindows(QWidget):
 
         SCHEDULER.stop()
         # 2.更新状态
-        pass
+
 
     def update_status_message(self, message):
         self.label_status.setText(message)

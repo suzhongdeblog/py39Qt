@@ -1,3 +1,4 @@
+import time
 import requests
 from bs4 import BeautifulSoup
 from PyQt5.QtCore import QThread, pyqtSignal
@@ -65,6 +66,8 @@ class TaskThread(QThread):
             # 停止
             if self.scheduler.terminate:
                 self.stop_signal.emit(self.row_index)
+                # 自己的线程在thread_list中移除掉
+                self.scheduler.destroy_thread(self)
                 return
 
             try:
@@ -84,3 +87,23 @@ class TaskThread(QThread):
             except Exception as e:
                 self.error_counter_signal.emit(self.row_index)
                 pass
+
+class StopThread(QThread):
+
+    update_signal = pyqtSignal(str)
+
+    def __init__(self, scheduler, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.scheduler = scheduler
+
+    def run(self):
+        # 1.监测线程数量(总线程数)
+        while True:
+            running_count = len(self.scheduler.thread_list)
+            self.update_signal.emit("正在终止({})".format(running_count))
+            if running_count == 0:
+                break
+            time.sleep(1)
+
+        self.update_signal.emit("已终止")
+

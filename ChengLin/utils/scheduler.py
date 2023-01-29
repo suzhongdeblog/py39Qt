@@ -34,10 +34,20 @@ class Scheduler(object):
             t.error_counter_signal.connect(fn_error_counter)
             t.stop_signal.connect(fn_stop)
             t.start()
-            pass
+
+            self.thread_list.append(t)
 
     def stop(self):
         self.terminate = True
+        # 创建线程,去监测 thread_list 中的数量 + 实时更新的窗体的label中
+        # self.window.update_status_message("xxx")
+        from ChengLin.utils.threads import StopThread
+        t = StopThread(self, self.window)
+        t.update_signal.connect(self.window.update_status_message)
+        t.start()
+
+    def destroy_thread(self, thread):
+        self.thread_list.remove(thread)
 
 
 # 单例模式
