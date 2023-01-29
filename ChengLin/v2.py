@@ -18,9 +18,17 @@ STATUS_MAPPING = {
     11: "初始化失败",
 }
 
+RUNNING = 1
+STOPPING = 2
+STOP = 3
+
 class MainWindows(QWidget):
     def __init__(self):
         super().__init__()
+
+        self.switch = STOP
+
+
         # 控件
         self.txt_asin=None
 
@@ -356,6 +364,12 @@ class MainWindows(QWidget):
 
     # 点击开始
     def event_start_click(self):
+        if self.switch != STOP:
+            QMessageBox.warning(self, "错误", "正在执行获取终止中,请勿重复操作")
+            return
+
+        self.switch = RUNNING
+
         # 1.为每一行创建一个线程去执行   （所有的线程记录）   [x,x,x,x,x]
         from utils.scheduler import SCHEDULER
 
@@ -404,6 +418,13 @@ class MainWindows(QWidget):
 
     # 点击停止
     def event_stop_click(self):
+        if self.switch != RUNNING:
+            QMessageBox.warning(self, "错误", "已停止或正在终止,请勿重复操作")
+            return
+
+
+        self.switch = STOPPING
+
         # 1.执行中的线程逐一终止
         from utils.scheduler import SCHEDULER
 
@@ -412,6 +433,9 @@ class MainWindows(QWidget):
 
 
     def update_status_message(self, message):
+        if message == "已终止":
+            self.switch = STOP
+
         self.label_status.setText(message)
         self.label_status.repaint()
 
