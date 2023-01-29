@@ -359,9 +359,30 @@ class MainWindows(QWidget):
         # 1.为每一行创建一个线程去执行   （所有的线程记录）   [x,x,x,x,x]
         from utils.scheduler import SCHEDULER
 
-        SCHEDULER.start()
+        SCHEDULER.start(
+            self,
+            self.task_start_callback,
+            self.task_counter_callback
+        )
+
         # 2.执行中
         self.update_status_message("执行中")
+
+    def task_start_callback(self,row_index):
+        # 对表格中的数据进行状态更新
+        cell_status = QTableWidgetItem(STATUS_MAPPING[2])
+        cell_status.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+        self.table_widget.setItem(row_index, 6, cell_status)
+
+    def task_counter_callback(self,row_index):
+        # 原有个数+1
+        old_count = self.table_widget.item(row_index, 4).text().strip()
+        new_count = int(old_count) + 1
+
+        # 表格赋值
+        cell_status = QTableWidgetItem(str(new_count))
+        cell_status.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+        self.table_widget.setItem(row_index, 4, cell_status)
 
     # 点击停止
     def event_stop_click(self):

@@ -2,13 +2,6 @@ import requests
 from bs4 import BeautifulSoup
 from PyQt5.QtCore import QThread, pyqtSignal
 
-HOST = "https://www.amazon.com/"
-HOST_ASIN_TPL = "{}{}".format(HOST, "gp/product/")
-HOST_TASK_LIST_TPL = "{}{}".format(HOST, "gp/offer-listing")
-
-# https://www.amazon.com/gp/product/B07YN82X3B/
-
-
 class NewTaskThread(QThread):
 
     # 信号，触发信号，更新窗体中的数据
@@ -47,3 +40,23 @@ class NewTaskThread(QThread):
         except Exception as e:
             title = "监控项 {} 添加失败。".format(self.asin)
             self.error.emit(self.row_index, self.asin, title, str(e))
+
+
+class TaskThread(QThread):
+    start_signal = pyqtSignal(int)
+    counter_signal = pyqtSignal(int)
+
+    def __init__(self, row_index, asin, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.row_index = row_index
+        self.asin = asin
+
+    def run(self):
+        # 触发start_signal
+        self.start_signal.emit(self.row_index)
+
+        import time
+        import random
+        while True:
+            time.sleep(random.randint(1, 3))
+            self.counter_signal.emit(self.row_index)
