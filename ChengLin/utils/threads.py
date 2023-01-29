@@ -46,8 +46,9 @@ class TaskThread(QThread):
     start_signal = pyqtSignal(int)
     counter_signal = pyqtSignal(int)
 
-    def __init__(self, row_index, asin, *args, **kwargs):
+    def __init__(self, log_file_path, row_index, asin, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.log_file_path = log_file_path
         self.row_index = row_index
         self.asin = asin
 
@@ -60,3 +61,6 @@ class TaskThread(QThread):
         while True:
             time.sleep(random.randint(1, 3))
             self.counter_signal.emit(self.row_index)
+
+            with open(self.log_file_path, mode='a', encoding='utf-8') as f:
+                f.write("日志\n")

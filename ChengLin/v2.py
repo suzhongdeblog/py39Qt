@@ -360,6 +360,7 @@ class MainWindows(QWidget):
         from utils.scheduler import SCHEDULER
 
         SCHEDULER.start(
+            BASE_DIR,
             self,
             self.task_start_callback,
             self.task_counter_callback
