@@ -1,6 +1,4 @@
 
-
-
 class Scheduler(object):
     def __init__(self):
         self.thread_list = []
@@ -26,7 +24,7 @@ class Scheduler(object):
             if status_text != "待执行":
                 continue
 
-            from ChengLin.utils.threads import TaskThread
+            from threads import TaskThread
             # 2.每个线程 执行 & 状态实时的显示在表格中 信号＋回调
             t = TaskThread(self, log_file_path, row_index, asin, window)
             t.start_signal.connect(fn_start)
@@ -41,7 +39,7 @@ class Scheduler(object):
         self.terminate = True
         # 创建线程,去监测 thread_list 中的数量 + 实时更新的窗体的label中
         # self.window.update_status_message("xxx")
-        from ChengLin.utils.threads import StopThread
+        from threads import StopThread
         t = StopThread(self, self.window)
         t.update_signal.connect(self.window.update_status_message)
         t.start()
