@@ -7,7 +7,7 @@ class Scheduler(object):
         self.window = None
         self.terminate = False  # 点击停止
 
-    def start(self, base_dir, window, fn_start, fn_counter):
+    def start(self, base_dir, window, fn_start, fn_counter, fn_error_counter):
         self.window = window
         self.terminate = False
         # 1.获取表格中的所有数据,每一行创建一个线程去执行监控
@@ -31,6 +31,7 @@ class Scheduler(object):
             t = TaskThread(log_file_path, row_index, asin, window)
             t.start_signal.connect(fn_start)
             t.counter_signal.connect(fn_counter)
+            t.error_counter_signal.connect(fn_error_counter)
             t.start()
             pass
 

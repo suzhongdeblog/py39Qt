@@ -363,7 +363,8 @@ class MainWindows(QWidget):
             BASE_DIR,
             self,
             self.task_start_callback,
-            self.task_counter_callback
+            self.task_counter_callback,
+            self.task_error_callback
         )
 
         # 2.执行中
@@ -384,6 +385,16 @@ class MainWindows(QWidget):
         cell_status = QTableWidgetItem(str(new_count))
         cell_status.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
         self.table_widget.setItem(row_index, 4, cell_status)
+
+    def task_error_callback(self,row_index):
+        # 原有个数+1
+        old_count = self.table_widget.item(row_index, 5).text().strip()
+        new_count = int(old_count) + 1
+
+        # 表格赋值
+        cell_status = QTableWidgetItem(str(new_count))
+        cell_status.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+        self.table_widget.setItem(row_index, 5, cell_status)
 
     # 点击停止
     def event_stop_click(self):

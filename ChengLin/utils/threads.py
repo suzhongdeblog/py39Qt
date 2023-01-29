@@ -45,6 +45,7 @@ class NewTaskThread(QThread):
 class TaskThread(QThread):
     start_signal = pyqtSignal(int)
     counter_signal = pyqtSignal(int)
+    error_counter_signal = pyqtSignal(int)
 
     def __init__(self, log_file_path, row_index, asin, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -59,8 +60,20 @@ class TaskThread(QThread):
         import time
         import random
         while True:
-            time.sleep(random.randint(1, 3))
-            self.counter_signal.emit(self.row_index)
+            try:
+                time.sleep(random.randint(1, 3))
+                self.counter_signal.emit(self.row_index)
 
-            with open(self.log_file_path, mode='a', encoding='utf-8') as f:
-                f.write("日志\n")
+                with open(self.log_file_path, mode='a', encoding='utf-8') as f:
+                    f.write("日志\n")
+
+
+                # 监控的动作
+                # 1.根据型号访问通过bs4获取数据
+                # 2.获取到数据 价格是否小于预期
+                # 3.发送报警 (邮件)
+
+                time.sleep(5)
+            except Exception as e:
+                self.error_counter_signal.emit(self.row_index)
+                pass
