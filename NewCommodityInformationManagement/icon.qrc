@@ -1,0 +1,27 @@
+<RCC>
+  <qresource prefix="icon">
+    <file>images/restore (1).png</file>
+    <file>images/table (1).png</file>
+    <file>images/table (2).png</file>
+    <file>images/按摩椅1_massage-chair-one (1).png</file>
+    <file>images/按摩椅1_massage-chair-one.png</file>
+    <file>images/方形_square.png</file>
+    <file>images/关闭-小_close-small (1).png</file>
+    <file>images/减_minus (2).png</file>
+    <file>images/口红_lipstick (1).png</file>
+    <file>images/口红_lipstick.png</file>
+    <file>images/美容_makeups (1).png</file>
+    <file>images/美容_makeups.png</file>
+    <file>images/女大衣_women-coat (1).png</file>
+    <file>images/女大衣_women-coat.png</file>
+    <file>images/苹果_apple-one (1).png</file>
+    <file>images/苹果_apple-one.png</file>
+    <file>images/上_up.png</file>
+    <file>images/手机_phone (1).png</file>
+    <file>images/手机_phone.png</file>
+    <file>images/双右_double-right.png</file>
+    <file>images/双左_double-left.png</file>
+    <file>images/添加_add-one.png</file>
+    <file>images/下_down.png</file>
+  </qresource>
+</RCC>
